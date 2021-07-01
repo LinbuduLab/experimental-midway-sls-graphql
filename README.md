@@ -1,2 +1,1 @@
-# midway-faas-type-graphql
-Midway-Serverless + TypeGraphQL MADE EASY!
+# Midway Serverless http trigger
