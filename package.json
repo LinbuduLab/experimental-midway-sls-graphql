@@ -19,7 +19,9 @@
   "dependencies": {
     "@midwayjs/core": "^2.3.0",
     "@midwayjs/decorator": "^2.3.0",
-    "@midwayjs/faas": "^2.0.0"
+    "@midwayjs/faas": "^2.0.0",
+    "graphql": "^15.5.1",
+    "type-graphql": "^1.1.1"
   },
   "devDependencies": {
     "@midwayjs/cli": "^1.2.45",
