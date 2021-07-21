@@ -26,7 +26,7 @@ export class HelloHTTPService {
 
   @ServerlessTrigger(ServerlessTriggerType.HTTP, {
     path: '/graphql',
-    method: 'get',
+    method: 'post',
   })
   async graphqlHandler() {
     return this.graphql.endpoint(this.ctx);

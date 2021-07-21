@@ -25,6 +25,7 @@ export class GraphQLService {
     this._schema = buildSchemaSync({
       resolvers: [path.resolve(__dirname, 'resolver/*')],
       container: () => {
+        console.log('container init');
         return {
           get: (target: any, data: ResolverData<GraphQLContext>) => {
             return data.context.requestContext.resolve(target);
@@ -42,9 +43,15 @@ export class GraphQLService {
     let body = ctx.req.body;
     if (body) {
       body = JSON.parse(body);
+      console.log('body: ', body);
     }
 
     const { query, variables } = body;
+
+    // console.log('this.schema: ', this.schema.getTypeMap()['T']);
+    // console.log('this.schema: ', this.schema);
+    // console.log('this.schema: ', this.schema.getQueryType());
+    // console.log('this.schema: ', this.schema.());
 
     return await graphql({
       schema: this.schema,

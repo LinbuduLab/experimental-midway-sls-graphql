@@ -4,7 +4,7 @@ import { join } from 'path';
 import { GraphQLService } from './service/GraphQLService';
 
 @Configuration({
-  imports: ['tgql'],
+  // imports: ['tgql'],
   importConfigs: [join(__dirname, './config/')],
   conflictCheck: true,
 })
