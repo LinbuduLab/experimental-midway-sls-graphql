@@ -4,9 +4,11 @@ import {
   ServerlessTrigger,
   ServerlessTriggerType,
   Query,
+  ALL,
 } from '@midwayjs/decorator';
 import { Context } from '@midwayjs/faas';
-import { GraphQLService } from '../service/GraphQLService';
+import { GraphQLService } from '../lib/core';
+import { RenderPlaygroundQueryOptions } from '../typing';
 
 @Provide()
 export class HelloHTTPService {
@@ -17,11 +19,13 @@ export class HelloHTTPService {
   graphql: GraphQLService;
 
   @ServerlessTrigger(ServerlessTriggerType.HTTP, {
-    path: '/',
+    path: '/graphql',
     method: 'get',
   })
-  async handleHTTPEvent(@Query() name = 'midwayjs') {
-    return `Hello ${name}！！`;
+  async graphqlPlaygroundHandler(
+    @Query(ALL) playgroundOptions: RenderPlaygroundQueryOptions
+  ) {
+    return await this.graphql.playground(this.ctx, playgroundOptions);
   }
 
   @ServerlessTrigger(ServerlessTriggerType.HTTP, {
@@ -29,6 +33,20 @@ export class HelloHTTPService {
     method: 'post',
   })
   async graphqlHandler() {
-    return this.graphql.endpoint(this.ctx);
+    return this.graphql.handler(this.ctx);
+  }
+
+  @ServerlessTrigger(ServerlessTriggerType.HTTP, {
+    path: '/fake',
+    method: 'get',
+  })
+  async graphqlFakeHandler() {
+    const { query, variables } = this.ctx.req.body;
+    const source = /* GraphQL */ `
+      type Person {
+        name: String @fake(type: firstName)
+      }
+    `;
+    return this.graphql.fakerEndPoint(query, variables, source);
   }
 }
