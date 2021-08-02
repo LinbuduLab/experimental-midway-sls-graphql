@@ -15,5 +15,7 @@ export interface RenderPlaygroundQueryOptions {
 
 export interface PluginConfig {
   // TODO: 选项合并
-  playground: boolean;
+  playground?: boolean;
+  rootValue?: any;
+  context?: Record<string, unknown>;
 }

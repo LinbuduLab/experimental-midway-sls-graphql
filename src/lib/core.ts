@@ -17,6 +17,7 @@ export class GraphQLService {
   config: PluginConfig;
 
   constructor(_container: IMidwayContainer, app: IMidwayApplication) {
+    // TODO: normalize config
     this.config = app.getConfig('faasGraphQLConfig');
 
     this._init();
@@ -64,7 +65,12 @@ export class GraphQLService {
       schema: this.schema,
       source: query,
       variableValues: variables,
-      contextValue: ctx,
+      contextValue: {
+        // avoid override incorrectly
+        ...(this.config.context ?? {}),
+        ...ctx,
+      },
+      rootValue: this.config.rootValue ?? {},
     });
   }
 

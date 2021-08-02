@@ -25,6 +25,7 @@ export class HelloHTTPService {
   async graphqlPlaygroundHandler(
     @Query(ALL) playgroundOptions: RenderPlaygroundQueryOptions
   ) {
+    console.log(this.ctx);
     return await this.graphql.playground(this.ctx, playgroundOptions);
   }
 
@@ -34,19 +35,5 @@ export class HelloHTTPService {
   })
   async graphqlHandler() {
     return this.graphql.handler(this.ctx);
-  }
-
-  @ServerlessTrigger(ServerlessTriggerType.HTTP, {
-    path: '/fake',
-    method: 'get',
-  })
-  async graphqlFakeHandler() {
-    const { query, variables } = this.ctx.req.body;
-    const source = /* GraphQL */ `
-      type Person {
-        name: String @fake(type: firstName)
-      }
-    `;
-    return this.graphql.fakerEndPoint(query, variables, source);
   }
 }
