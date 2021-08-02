@@ -7,8 +7,6 @@ import { ErrorInterceptor } from './error-interceptor';
 
 import { PluginConfig, RenderPlaygroundQueryOptions } from '../typing';
 import { IMidwayApplication, IMidwayContainer } from '@midwayjs/core';
-import { buildWithFakeDefinitions } from '../lib/mock/def';
-import { fakeFieldResolver, fakeTypeResolver } from '../lib/mock/schema';
 
 export interface GraphQLContext extends FaaSContext {
   __key__: never;
@@ -26,16 +24,7 @@ export class GraphQLService {
 
   private _init() {
     const schema = this.buildGraphQLSchema();
-    this._schema = this.config.mock
-      ? this.useFakerExtendedSchema(schema)
-      : schema;
-  }
-
-  private useFakerExtendedSchema(schema: GraphQLSchema) {
-    const extendedSchema = buildWithFakeDefinitions(
-      new Source(printSchema(schema))
-    );
-    return extendedSchema;
+    this._schema = schema;
   }
 
   private buildGraphQLSchema() {
@@ -79,46 +68,10 @@ export class GraphQLService {
     });
   }
 
-  async fakeHandler(ctx: FaaSContext) {
-    let body = ctx.req.body;
-    if (body) {
-      body = JSON.parse(body);
-    }
-
-    const { query, variables } = body;
-
-    if (!this.schema || !Object.keys(this.schema).length) {
-      throw new Error('[ Midway-FaaS-GraphQL ] Invalid Built GraphQLSchema');
-    }
-
-    return await graphql({
-      schema: this.schema,
-      typeResolver: fakeTypeResolver,
-      fieldResolver: fakeFieldResolver,
-      source: query,
-      variableValues: variables,
-    });
-  }
-
   async playground(
     ctx: FaaSContext,
     renderOptions: RenderPlaygroundQueryOptions
   ) {
     return midwayFaaSPlayground({ editorOptions: renderOptions })(ctx);
-  }
-
-  async fakerEndPoint(
-    query: string,
-    variables: Maybe<{ [key: string]: any }>,
-    source: string
-  ) {
-    const schema = buildWithFakeDefinitions(new Source(source));
-    return await graphql({
-      schema,
-      typeResolver: fakeTypeResolver,
-      fieldResolver: fakeFieldResolver,
-      source: query,
-      variableValues: variables,
-    });
   }
 }

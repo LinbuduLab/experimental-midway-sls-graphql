@@ -15,6 +15,5 @@ export const graphqlPlaygroundSettings = {
 } as ISettings;
 
 export const faasGraphQLConfig: PluginConfig = {
-  mock: false,
   playground: true,
 };

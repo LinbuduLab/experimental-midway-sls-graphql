@@ -14,7 +14,6 @@ export interface RenderPlaygroundQueryOptions {
 }
 
 export interface PluginConfig {
-  mock: boolean;
   // TODO: 选项合并
   playground: boolean;
 }
