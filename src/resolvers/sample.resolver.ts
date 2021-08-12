@@ -1,4 +1,4 @@
-import { Provide, Inject } from '@midwayjs/decorator';
+import { Provide, Inject, App } from '@midwayjs/decorator';
 import { Resolver, Query } from 'type-graphql';
 import { SampleService } from '../service/sample-service';
 import { SampleType } from '../graphql/type';
@@ -11,7 +11,7 @@ export class SampleResolver {
   @Inject()
   graphql: GraphQLService;
 
-  @Ctx()
+  // @Ctx()
   @Tmp()
   xxx: string;
 

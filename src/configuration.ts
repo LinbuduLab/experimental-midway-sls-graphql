@@ -1,4 +1,4 @@
-import { Configuration, listModule } from '@midwayjs/decorator';
+import { Configuration, listModule, App } from '@midwayjs/decorator';
 import {
   ILifeCycle,
   IMidwayApplication,

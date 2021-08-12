@@ -5,6 +5,7 @@ import {
   saveModule,
   savePropertyMetadata,
   attachPropertyMetadata,
+  attachClassMetadata,
 } from '@midwayjs/decorator';
 
 const MODEL_KEY = 'decorator:model';
@@ -50,6 +51,7 @@ export function Ctx(): PropertyDecorator {
 
 export function Tmp(): PropertyDecorator {
   return target => {
+    attachClassMetadata('X', 'tmp', target);
     console.log('target: ', target);
   };
 }
