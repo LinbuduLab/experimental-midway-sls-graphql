@@ -16,8 +16,10 @@ export class GraphQLService {
   _schema?: GraphQLSchema;
   config: PluginConfig;
 
-  constructor(_container: IMidwayContainer, app: IMidwayApplication) {
-    // TODO: normalize config
+  constructor(
+    public container: IMidwayContainer,
+    public app: IMidwayApplication
+  ) {
     this.config = app.getConfig('faasGraphQLConfig');
 
     this._init();
@@ -28,9 +30,18 @@ export class GraphQLService {
     this._schema = schema;
   }
 
+  // TODO: built-in options
+  // useErrorInterceptor
+  // resolvers
+  // useContainer
+  // useDirectives
+  // useScalars
+  // dateScalarMode
+  // resolverTimeExtension
+  // complexity
   private buildGraphQLSchema() {
     return buildSchemaSync({
-      resolvers: [path.resolve(__dirname, 'resolver/*')],
+      resolvers: [path.resolve(this.app.getBaseDir(), 'resolver/*')],
       dateScalarMode: 'timestamp',
 
       globalMiddlewares: [ErrorInterceptor],
@@ -66,7 +77,7 @@ export class GraphQLService {
       source: query,
       variableValues: variables,
       contextValue: {
-        // avoid override incorrectly
+        // FIXME: Avoid incorrect overriding
         ...(this.config.context ?? {}),
         ...ctx,
       },

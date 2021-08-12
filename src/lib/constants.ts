@@ -36,7 +36,7 @@ export const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 export const playgroundDefaultSettings: ApolloServerPluginLandingPageGraphQLPlaygroundOptions['settings'] =
   {
-    'editor.cursorShape': 'block',
+    'editor.cursorShape': 'line',
     'editor.theme': 'dark',
     'editor.reuseHeaders': true,
     'tracing.hideTracingResponse': false,

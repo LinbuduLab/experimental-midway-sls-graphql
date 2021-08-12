@@ -1,9 +1,9 @@
 import { Provide, Inject, App } from '@midwayjs/decorator';
-import { Resolver, Query } from 'type-graphql';
+import { Resolver, Query, FieldResolver, Root } from 'type-graphql';
 import { SampleService } from '../service/sample-service';
-import { SampleType } from '../graphql/type';
+import { SampleType } from '../graphql/sample.type';
+import { ChildType } from '../graphql/child.type';
 import { GraphQLService } from '../lib/core';
-import { Ctx, Tmp } from '../lib/decorators';
 
 @Provide()
 @Resolver(type => SampleType)
@@ -11,27 +11,22 @@ export class SampleResolver {
   @Inject()
   graphql: GraphQLService;
 
-  // @Ctx()
-  @Tmp()
-  xxx: string;
-
   @Inject()
   sampleService1: SampleService;
 
   @Query(type => SampleType)
   QuerySample(): SampleType {
-    console.log(this.xxx);
-    // console.log(this.graphql);
-    // console.log(this.sampleService);
     return {
-      SampleField: 'xxx',
+      SampleField: 'SampleField',
+      Child: {
+        ChildField: 'ChildField',
+      },
     };
   }
 
-  @Query()
-  QueryContextValue(): string {
-    // console.log(this.sampleService);
-    // return this.
-    return '';
+  @FieldResolver(() => String)
+  FieldQuerySample(@Root() sample: SampleType) {
+    console.log('sample: ', sample);
+    return `FieldQuerySample! ${sample.SampleField}`;
   }
 }

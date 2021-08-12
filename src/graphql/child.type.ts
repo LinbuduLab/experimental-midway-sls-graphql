@@ -1,7 +1,7 @@
 import { ObjectType, Field } from 'type-graphql';
 
 @ObjectType()
-export class SampleType {
+export class ChildType {
   @Field()
-  SampleField!: string;
+  ChildField!: string;
 }

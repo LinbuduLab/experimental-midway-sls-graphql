@@ -10,6 +10,9 @@ import {
 
 const MODEL_KEY = 'decorator:model';
 
+// TODO:
+// @Ctx
+
 // export function Model(): ClassDecorator {
 //   return (target: any) => {
 //     // 将装饰的类，绑定到该装饰器，用于后续能获取到 class
