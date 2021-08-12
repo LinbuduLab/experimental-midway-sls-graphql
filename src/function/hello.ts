@@ -7,41 +7,13 @@ import {
   Query,
   ALL,
 } from '@midwayjs/decorator';
-import { Context, FaaSHTTPContext } from '@midwayjs/faas';
-import { GraphQLService } from '../lib/core';
+import { Context } from '@midwayjs/faas';
 import { RenderPlaygroundQueryOptions } from '../typing';
-import { gql } from 'apollo-server-core';
-import { makeExecutableSchema } from '@graphql-tools/schema';
 
 import { ApolloServer } from '../lib/apollo';
-
-const typeDefs = gql`
-  type Query {
-    users: [User!]!
-    user(username: String): User
-  }
-  type User {
-    name: String
-    username: String
-  }
-`;
-const users = [
-  { name: 'Leeroy Jenkins', username: 'leeroy' },
-  { name: 'Foo Bar', username: 'foobar' },
-];
-
-const resolvers = {
-  Query: {
-    users() {
-      return users;
-    },
-    user(parent, { username }) {
-      return users.find(user => user.username === username);
-    },
-  },
-};
-
-export const schema = makeExecutableSchema({ typeDefs, resolvers });
+import { GraphQLService } from '../lib/core';
+import { createApolloServer } from '../lib/apollo-wrapper';
+import { schema } from '../lib/tmp-schema';
 
 @Provide()
 export class HelloHTTPService {
@@ -58,7 +30,6 @@ export class HelloHTTPService {
   async graphqlPlaygroundHandler(
     @Query(ALL) playgroundOptions: RenderPlaygroundQueryOptions
   ) {
-    console.log(this.ctx);
     return await this.graphql.playground(this.ctx, playgroundOptions);
   }
 
@@ -71,28 +42,50 @@ export class HelloHTTPService {
   }
 
   @ServerlessTrigger(ServerlessTriggerType.HTTP, {
-    path: '/micro',
+    path: '/apollo',
     method: 'get',
   })
   async apolloHandler() {
+    return await createApolloServer({
+      path: '/apollo',
+      ...this.ctx,
+    });
+  }
+
+  @ServerlessTrigger(ServerlessTriggerType.HTTP, {
+    path: '/apollo',
+    method: 'post',
+  })
+  async apolloPostHandler() {
+    return await createApolloServer({
+      path: '/apollo',
+      ...this.ctx,
+    });
+  }
+
+  @ServerlessTrigger(ServerlessTriggerType.HTTP, {
+    path: '/deprecated',
+    method: 'get',
+  })
+  async apolloHandlerDeprecated() {
     const server = new ApolloServer({ schema });
     await server.start();
     return server.createHandler({
-      path: '/micro',
+      path: '/deprecated',
       req: this.ctx.request,
       res: this.ctx.response,
     });
   }
 
   @ServerlessTrigger(ServerlessTriggerType.HTTP, {
-    path: '/micro',
+    path: '/deprecated',
     method: 'post',
   })
-  async apolloPostHandler() {
+  async apolloPostHandlerDeprecated() {
     const server = new ApolloServer({ schema });
     await server.start();
     return server.createHandler({
-      path: '/micro',
+      path: '/deprecated',
       req: this.ctx.request,
       res: this.ctx.response,
     });
