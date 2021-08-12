@@ -1,40 +1,83 @@
+import { ApolloServerBase, GraphQLOptions } from 'apollo-server-core';
+import { parseAll } from '@hapi/accept';
+import { LandingPage } from 'apollo-server-plugin-base';
+
+import { graphqlCoreHandler } from './handler';
+
 import {
-  GraphQLOptions,
-  runHttpQuery,
-  convertNodeHttpToRequest,
-} from 'apollo-server-core';
-import { ValueOrPromise } from 'apollo-server-types';
-import { MidwayReq, MidwayRes } from './types';
+  ApolloContext,
+  CreateHandlerOption,
+  MidwayReq,
+  MidwayRes,
+} from './types';
 
-export interface GraphQLOptionsFunction {
-  (req?: MidwayReq): ValueOrPromise<GraphQLOptions>;
-}
+export class ApolloServerMidway extends ApolloServerBase {
+  async createGraphQLServerOptions(
+    req: MidwayReq,
+    res: MidwayRes
+  ): Promise<GraphQLOptions> {
+    return super.graphQLServerOptions({ req, res });
+  }
 
-function setHeaders(res: MidwayRes, headers: Record<string, string>): void {
-  Object.entries(headers).forEach(([header, value]) => {
-    res.set(header, value);
-  });
-}
+  public async createHandler({ path, req, res }: CreateHandlerOption) {
+    this.assertStarted('createHandler');
 
-export function graphqlCoreHandler(
-  options: GraphQLOptions | GraphQLOptionsFunction
-) {
-  const graphqlHandler = async (req: MidwayReq, res: MidwayRes) => {
-    const query = req.method === 'GET' ? req.query : req.body;
+    this.graphqlPath = path || '/graphql';
 
-    const { graphqlResponse, responseInit } = await runHttpQuery([req, res], {
-      method: req.method,
-      options,
-      query,
-      request: convertNodeHttpToRequest(req as any),
-    });
+    const landingPage = this.getLandingPage();
 
-    setHeaders(res, responseInit.headers!);
-    const statusCode = responseInit.status || 200;
-    res.status = statusCode;
-    res.body = graphqlResponse;
-    return undefined;
-  };
+    if (
+      landingPage &&
+      this.handleGraphqlRequestsWithLandingPage({ req, res, landingPage })
+    ) {
+      return;
+    }
+    if (await this.handleGraphqlRequestsWithServer({ req, res })) {
+      return;
+    }
+  }
 
-  return graphqlHandler;
+  private handleGraphqlRequestsWithLandingPage({
+    req,
+    res,
+    landingPage,
+  }: ApolloContext & {
+    landingPage: LandingPage;
+  }): boolean {
+    let handled = false;
+
+    const url = req.url!.split('?')[0];
+    if (req.method === 'GET' && url === this.graphqlPath) {
+      const accept = parseAll(req.headers);
+      const types = accept.mediaTypes as string[];
+      const prefersHtml =
+        types.find(
+          (x: string) => x === 'text/html' || x === 'application/json'
+        ) === 'text/html';
+
+      if (prefersHtml) {
+        res.set('Content-Type', 'text/html; charset=utf-8');
+        res.body = landingPage.html;
+        handled = true;
+      }
+    }
+
+    return handled;
+  }
+
+  private async handleGraphqlRequestsWithServer({
+    req,
+    res,
+  }: ApolloContext): Promise<boolean> {
+    let handled = false;
+    const url = req.url!.split('?')[0];
+    if (url === this.graphqlPath) {
+      const graphqlHandler = graphqlCoreHandler(() => {
+        return this.createGraphQLServerOptions(req, res);
+      });
+      await graphqlHandler(req, res);
+      handled = true;
+    }
+    return handled;
+  }
 }

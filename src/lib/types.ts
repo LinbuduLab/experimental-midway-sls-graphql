@@ -7,3 +7,11 @@ export type ApolloContext = {
   req: MidwayReq;
   res: MidwayRes;
 };
+
+export type CreateHandlerOption = ApolloContext & {
+  path?: string;
+};
+
+export type CreateExpHandlerOption = Context & {
+  path?: string;
+};
