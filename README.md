@@ -10,3 +10,17 @@
   - 通过 extensions 字段提供一部分额外数据，如 Resolver Timing、 Response Tracing 等。
   - 内置一批 Directives / Scalars
   - 将 Midway Container 作为一个 Object Type 来提供更好的 Debug 能力？
+
+芜湖！第二版！
+
+## TODO:
+
+- 内置一批 Apollo Server Plugin，并以单个选项开启，如 `complexity: {}`
+- Apollo-Server / TypeGraphQL 配置处理（去掉目前不支持的选项）
+- 内置一批 Directives、Scalars（为 BaaS 做准备）
+- 自定义装饰器
+- 支持响应生成的 schema
+- 鉴权
+- 支持响应 Voyager？
+- Vercel 相关
+- Lodash based directives

@@ -3,6 +3,7 @@ service:
 
 provider:
   name: aliyun
-# custom:
-#   customDomain:
-#     domainName: auto
+
+custom:
+  customDomain:
+    domainName: apollo.linbudu.top
