@@ -37,6 +37,12 @@ export class ApolloServerMidway extends ApolloServerBase {
     }
   }
 
+  private getURLLastPart(url: string): string {
+    const urlFragments = url.split('/');
+    const lastFragment = urlFragments[urlFragments.length - 1];
+    return `/${lastFragment}`;
+  }
+
   private handleGraphqlRequestsWithLandingPage({
     req,
     res,
@@ -46,7 +52,7 @@ export class ApolloServerMidway extends ApolloServerBase {
   }): boolean {
     let handled = false;
 
-    const url = req.url!.split('?')[0];
+    const url = this.getURLLastPart(req.url);
     if (req.method === 'GET' && url === this.graphqlPath) {
       const accept = parseAll(req.headers);
       const types = accept.mediaTypes as string[];
@@ -70,7 +76,9 @@ export class ApolloServerMidway extends ApolloServerBase {
     res,
   }: ApolloContext): Promise<boolean> {
     let handled = false;
-    const url = req.url!.split('?')[0];
+    // const url = req.url!.split('?')[0];
+    const url = this.getURLLastPart(req.url);
+    console.log('url: ', url);
     if (url === this.graphqlPath) {
       const graphqlHandler = graphqlCoreHandler(() => {
         return this.createGraphQLServerOptions(req, res);

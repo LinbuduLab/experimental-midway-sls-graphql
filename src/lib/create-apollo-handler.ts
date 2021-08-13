@@ -8,7 +8,9 @@ import { CreateExpHandlerOption } from './types';
 import { playgroundDefaultSettings } from './constants';
 import { ApolloServerMidway } from './apollo-server-midway';
 
-export async function experimentHandler(config: CreateExpHandlerOption) {
+export async function experimentalCreateHandler(
+  option: CreateExpHandlerOption
+) {
   const schema = buildSchemaSync({
     resolvers: [path.resolve(__dirname, 'resolver/*')],
     dateScalarMode: 'timestamp',
@@ -26,8 +28,8 @@ export async function experimentHandler(config: CreateExpHandlerOption) {
 
   await server.start();
   return server.createHandler({
-    path: config.path,
-    req: config.request,
-    res: config.response,
+    path: option.path,
+    req: option.request,
+    res: option.response,
   });
 }

@@ -9,15 +9,15 @@ import {
 } from '@midwayjs/decorator';
 import { Context } from '@midwayjs/faas';
 import { RenderPlaygroundQueryOptions } from '../typing';
-import { ApolloServerMidway } from '../lib/apollo-server-midway';
 import { GraphQLService } from '../lib/core';
-import { experimentHandler } from '../lib/apollo-wrapper';
+import { experimentalCreateHandler } from '../lib/create-apollo-handler';
 import {
   APOLLO_SERVER_MIDWAY_PATH,
-  DEPRECATED_HANDLER_PATH,
   ORIGIN_GRAPHQL_HANDLER_PATH,
-  schema,
 } from '../lib/constants';
+
+const apolloHandlerFuncName = 'apollo-handler';
+const graphqlHandlerFuncName = 'graphql-handler';
 
 @Provide()
 export class HelloHTTPService {
@@ -27,7 +27,9 @@ export class HelloHTTPService {
   @Inject()
   graphql: GraphQLService;
 
-  // Handled by Original GraphQL
+  @ServerlessFunction({
+    functionName: graphqlHandlerFuncName,
+  })
   @ServerlessTrigger(ServerlessTriggerType.HTTP, {
     path: ORIGIN_GRAPHQL_HANDLER_PATH,
     method: 'get',
@@ -46,55 +48,18 @@ export class HelloHTTPService {
     return this.graphql.handler(this.ctx);
   }
 
-  // Handled by Apollo-Server-Midway + TypeGraphQL
+  @ServerlessFunction({
+    functionName: apolloHandlerFuncName,
+  })
   @ServerlessTrigger(ServerlessTriggerType.HTTP, {
     path: APOLLO_SERVER_MIDWAY_PATH,
     method: 'get',
+  })
+  @ServerlessTrigger(ServerlessTriggerType.HTTP, {
+    path: APOLLO_SERVER_MIDWAY_PATH,
+    method: 'post',
   })
   async apolloHandler() {
-    return await experimentHandler({
-      path: APOLLO_SERVER_MIDWAY_PATH,
-      ...this.ctx,
-    });
-  }
-
-  @ServerlessTrigger(ServerlessTriggerType.HTTP, {
-    path: APOLLO_SERVER_MIDWAY_PATH,
-    method: 'post',
-  })
-  async apolloPostHandler() {
-    return await experimentHandler({
-      path: APOLLO_SERVER_MIDWAY_PATH,
-      ...this.ctx,
-    });
-  }
-
-  // Handled by Apollo-Server-Midway + Splited `Schema Definition` & `Resolvers`
-  @ServerlessTrigger(ServerlessTriggerType.HTTP, {
-    path: DEPRECATED_HANDLER_PATH,
-    method: 'get',
-  })
-  async apolloHandlerDeprecated() {
-    const server = new ApolloServerMidway({ schema });
-    await server.start();
-    return server.createHandler({
-      path: DEPRECATED_HANDLER_PATH,
-      req: this.ctx.request,
-      res: this.ctx.response,
-    });
-  }
-
-  @ServerlessTrigger(ServerlessTriggerType.HTTP, {
-    path: DEPRECATED_HANDLER_PATH,
-    method: 'post',
-  })
-  async apolloPostHandlerDeprecated() {
-    const server = new ApolloServerMidway({ schema });
-    await server.start();
-    return server.createHandler({
-      path: DEPRECATED_HANDLER_PATH,
-      req: this.ctx.request,
-      res: this.ctx.response,
-    });
+    return await experimentalCreateHandler(this.ctx);
   }
 }

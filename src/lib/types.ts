@@ -10,8 +10,10 @@ export type ApolloContext = {
 
 export type CreateHandlerOption = ApolloContext & {
   path?: string;
+  functionName?: string;
 };
 
 export type CreateExpHandlerOption = Context & {
   path?: string;
+  functionName?: string;
 };

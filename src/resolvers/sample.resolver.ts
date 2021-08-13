@@ -26,7 +26,6 @@ export class SampleResolver {
 
   @FieldResolver(() => String)
   FieldQuerySample(@Root() sample: SampleType) {
-    console.log('sample: ', sample);
     return `FieldQuerySample! ${sample.SampleField}`;
   }
 }
