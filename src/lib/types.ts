@@ -1,19 +1,40 @@
 import { Context } from '@midwayjs/faas';
+import { BuildSchemaOptions } from 'type-graphql';
+import { Config as ApolloServerConfig } from 'apollo-server-core';
 
 export type MidwayReq = Context['request'];
 export type MidwayRes = Context['response'];
 
-export type ApolloContext = {
+export type MidwaySLSReqRes = {
   req: MidwayReq;
   res: MidwayRes;
 };
 
-export type CreateHandlerOption = ApolloContext & {
+// TODO: Built-in lib options: resolve-time query-complexity error-interceptor ...
+export type CreateHandlerOption = {
+  context: Context;
   path?: string;
   functionName?: string;
-};
-
-export type CreateExpHandlerOption = Context & {
-  path?: string;
-  functionName?: string;
+  useResolveTimeExtension?: boolean;
+  useQueryComplexityExtension?: boolean;
+  apollo?: Pick<
+    ApolloServerConfig,
+    | 'persistedQueries'
+    | 'plugins'
+    | 'context'
+    | 'formatError'
+    | 'formatResponse'
+    | 'rootValue'
+    | 'dataSources'
+    | 'introspection'
+  >;
+  schema?: Pick<
+    BuildSchemaOptions,
+    | 'authChecker'
+    | 'authMode'
+    | 'dateScalarMode'
+    | 'globalMiddlewares'
+    | 'nullableByDefault'
+    | 'skipCheck'
+  >;
 };

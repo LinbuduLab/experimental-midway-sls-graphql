@@ -60,6 +60,8 @@ export class HelloHTTPService {
     method: 'post',
   })
   async apolloHandler() {
-    return await experimentalCreateHandler(this.ctx);
+    return await experimentalCreateHandler({
+      context: this.ctx,
+    });
   }
 }

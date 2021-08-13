@@ -5,7 +5,7 @@ import { LandingPage } from 'apollo-server-plugin-base';
 import { graphqlCoreHandler } from './handler';
 
 import {
-  ApolloContext,
+  MidwaySLSReqRes,
   CreateHandlerOption,
   MidwayReq,
   MidwayRes,
@@ -19,7 +19,10 @@ export class ApolloServerMidway extends ApolloServerBase {
     return super.graphQLServerOptions({ req, res });
   }
 
-  public async createHandler({ path, req, res }: CreateHandlerOption) {
+  public async createHandler({
+    path,
+    context: { req, res },
+  }: CreateHandlerOption) {
     this.assertStarted('createHandler');
 
     this.graphqlPath = path || '/graphql';
@@ -47,7 +50,7 @@ export class ApolloServerMidway extends ApolloServerBase {
     req,
     res,
     landingPage,
-  }: ApolloContext & {
+  }: MidwaySLSReqRes & {
     landingPage: LandingPage;
   }): boolean {
     let handled = false;
@@ -74,9 +77,8 @@ export class ApolloServerMidway extends ApolloServerBase {
   private async handleGraphqlRequestsWithServer({
     req,
     res,
-  }: ApolloContext): Promise<boolean> {
+  }: MidwaySLSReqRes): Promise<boolean> {
     let handled = false;
-    // const url = req.url!.split('?')[0];
     const url = this.getURLLastPart(req.url);
     console.log('url: ', url);
     if (url === this.graphqlPath) {

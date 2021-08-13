@@ -4,20 +4,19 @@ import {
 } from 'apollo-server-core';
 import path from 'path';
 import { buildSchemaSync } from 'type-graphql';
-import { CreateExpHandlerOption } from './types';
+import { CreateHandlerOption } from './types';
 import { playgroundDefaultSettings } from './constants';
 import { ApolloServerMidway } from './apollo-server-midway';
 import { ResolveTimeExtensionMiddleware } from './resolve-time';
 import { resolveTimeExtensionPlugin } from './resolve-time-extension';
 import { queryComplexityExtensionPlugin } from './query-complexity-plugin';
 
-export async function experimentalCreateHandler(
-  option: CreateExpHandlerOption
-) {
+export async function experimentalCreateHandler(option: CreateHandlerOption) {
   const schema = buildSchemaSync({
     resolvers: [path.resolve(__dirname, 'resolver/*')],
     globalMiddlewares: [ResolveTimeExtensionMiddleware],
     dateScalarMode: 'timestamp',
+    ...option.schema,
   });
 
   const server = new ApolloServerMidway({
@@ -35,7 +34,6 @@ export async function experimentalCreateHandler(
   await server.start();
   return server.createHandler({
     path: option.path,
-    req: option.request,
-    res: option.response,
+    context: option.context,
   });
 }
