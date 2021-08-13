@@ -3,7 +3,6 @@ service:
 
 provider:
   name: aliyun
-
-custom:
-  customDomain:
-    domainName: auto
+# custom:
+#   customDomain:
+#     domainName: auto

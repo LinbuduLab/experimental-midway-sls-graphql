@@ -7,12 +7,15 @@ import { buildSchemaSync } from 'type-graphql';
 import { CreateExpHandlerOption } from './types';
 import { playgroundDefaultSettings } from './constants';
 import { ApolloServerMidway } from './apollo-server-midway';
+import { ResolveTimeExtensionMiddleware } from './resolve-time';
+import { resolveTimeExtensionPlugin } from './resolve-time-extension';
 
 export async function experimentalCreateHandler(
   option: CreateExpHandlerOption
 ) {
   const schema = buildSchemaSync({
     resolvers: [path.resolve(__dirname, 'resolver/*')],
+    globalMiddlewares: [ResolveTimeExtensionMiddleware],
     dateScalarMode: 'timestamp',
   });
 
@@ -23,6 +26,7 @@ export async function experimentalCreateHandler(
       ApolloServerPluginLandingPageGraphQLPlayground({
         settings: playgroundDefaultSettings,
       }),
+      resolveTimeExtensionPlugin(),
     ],
   });
 
