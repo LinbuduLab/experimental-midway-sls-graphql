@@ -49,6 +49,7 @@ export const queryComplexityExtensionPlugin = <Context>(
 
         willSendResponse: async (reqContext: GraphQLRequestContext) => {
           reqContext.response!.extensions = {
+            ...reqContext.response!.extensions,
             CURRENT_COMPLEXITY: complexity,
           };
         },

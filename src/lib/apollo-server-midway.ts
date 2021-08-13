@@ -21,7 +21,7 @@ export class ApolloServerMidway extends ApolloServerBase {
 
   public async createHandler({
     path,
-    context: { req, res },
+    context: { request: req, response: res },
   }: CreateHandlerOption) {
     this.assertStarted('createHandler');
 
@@ -80,7 +80,6 @@ export class ApolloServerMidway extends ApolloServerBase {
   }: MidwaySLSReqRes): Promise<boolean> {
     let handled = false;
     const url = this.getURLLastPart(req.url);
-    console.log('url: ', url);
     if (url === this.graphqlPath) {
       const graphqlHandler = graphqlCoreHandler(() => {
         return this.createGraphQLServerOptions(req, res);

@@ -61,6 +61,7 @@ export class HelloHTTPService {
   })
   async apolloHandler() {
     return await experimentalCreateHandler({
+      path: '/apollo',
       context: this.ctx,
     });
   }
