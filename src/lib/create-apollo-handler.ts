@@ -9,6 +9,7 @@ import { playgroundDefaultSettings } from './constants';
 import { ApolloServerMidway } from './apollo-server-midway';
 import { ResolveTimeExtensionMiddleware } from './resolve-time';
 import { resolveTimeExtensionPlugin } from './resolve-time-extension';
+import { queryComplexityExtensionPlugin } from './query-complexity-plugin';
 
 export async function experimentalCreateHandler(
   option: CreateExpHandlerOption
@@ -27,7 +28,8 @@ export async function experimentalCreateHandler(
         settings: playgroundDefaultSettings,
       }),
       resolveTimeExtensionPlugin(),
-    ],
+      queryComplexityExtensionPlugin(schema),
+    ].filter(Boolean),
   });
 
   await server.start();
